@@ -27,12 +27,18 @@ return {
 		-- See :h blink-cmp-config-keymap for defining your own keymap
 		keymap = {
 			-- Each keymap may be a list of commands and/or functions
-			preset = "enter",
+			preset = "none", -- use custom mappings
+			-- Accept completion
+			["<CR>"] = { "accept", "fallback" },
+			["<C-y>"] = { "accept", "fallback" },
 			-- Select completions
 			["<Up>"] = { "select_prev", "fallback" },
 			["<Down>"] = { "select_next", "fallback" },
-			["<Tab>"] = { "select_next", "fallback" },
-			["<S-Tab>"] = { "select_prev", "fallback" },
+			["<C-n>"] = { "select_next", "fallback" },
+			["<C-p>"] = { "select_prev", "fallback" },
+			-- Show/hide menu
+			["<C-Space>"] = { "show", "show_documentation", "hide_documentation" },
+			["<C-e>"] = { "hide", "fallback" },
 			-- Scroll documentation
 			["<C-b>"] = { "scroll_documentation_up", "fallback" },
 			["<C-f>"] = { "scroll_documentation_down", "fallback" },
