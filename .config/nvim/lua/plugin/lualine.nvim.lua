@@ -39,7 +39,17 @@ return {
                         shorting_target = 40,
                     },
                 },
-                lualine_x = { "encoding", "filesize", "filetype" },
+                lualine_x = {
+                    "encoding",
+                    "filesize",
+                    "filetype",
+                    {
+                        function()
+                            return vim.g._resize_mode and "Resize Mode" or ""
+                        end,
+                        color = { fg = "#ffcc00", gui = "bold" },
+                    },
+                },
                 lualine_y = { "progress" },
                 lualine_z = { "location" },
             },

@@ -1,13 +1,15 @@
 return {
     "saghen/blink.cmp",
-    dependencies = { "rafamadriz/friendly-snippets" },
+    dependencies = {
+        "rafamadriz/friendly-snippets",
+    },
     version = "*",
     opts = {
         keymap = {
             preset = "enter",
             -- Select completions
-            ["<Tab>"] = { "select_next", "fallback" },
-            ["<S-Tab>"] = { "select_prev", "fallback" },
+            -- ["<Tab>"] = { "select_next", "fallback" },
+            -- ["<S-Tab>"] = { "select_prev", "fallback" },
             -- Scroll documentation
             ["<C-d>"] = { "scroll_documentation_down", "fallback" },
             ["<C-u>"] = { "scroll_documentation_up", "fallback" },

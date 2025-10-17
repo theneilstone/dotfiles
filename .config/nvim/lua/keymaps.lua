@@ -15,9 +15,48 @@ keymap.set("n", "<C-j>", "<C-w>j", opts("Move to bottom window"))
 keymap.set("n", "<C-k>", "<C-w>k", opts("Move to top window"))
 keymap.set("n", "<C-l>", "<C-w>l", opts("Move to right window"))
 
+-- Window split
+keymap.set("n", "<leader>sv", "<C-w>v", opts("Split window vertically"))
+keymap.set("n", "<leader>sh", "<C-w>s", opts("Split window horizontally"))
+keymap.set("n", "<leader>se", "<C-w>=", opts("Make splits equal size"))
+keymap.set("n", "<leader>sx", "<cmd>close<CR>", opts("Close current split"))
+
+-- Window resize mode (press <leader>r to enter, then use hjkl repeatedly)
+keymap.set("n", "<leader>r", function()
+    if vim.bo.buftype ~= "" then return end
+    vim.g._resize_mode = true
+    vim.notify("[Resize Mode] Entered", vim.log.levels.INFO)
+    local actions = {
+        h = function() vim.cmd("vertical resize -2") end,
+        j = function() vim.cmd("resize -2") end,
+        k = function() vim.cmd("resize +2") end,
+        l = function() vim.cmd("vertical resize +2") end,
+        e = function() vim.cmd("wincmd =") end,
+    }
+    while true do
+        local ok, char = pcall(vim.fn.getchar)
+        if not ok then break end
+        local key = type(char) == "number" and vim.fn.nr2char(char) or char
+        if key == "x" then
+            vim.g._resize_mode = false
+            vim.notify("[Resize Mode] Exit", vim.log.levels.INFO)
+            break
+        end
+        local action = actions[key]
+        if action then action() end
+    end
+    vim.g._resize_mode = false
+end, opts("Enter window resize mode"))
+
 -- Quick escape
 keymap.set("i", "jk", "<ESC>", opts("Exit insert mode"))
 keymap.set("i", "kj", "<ESC>", opts("Exit insert mode"))
+
+-- Save and quit
+keymap.set("n", "<leader>w", "<cmd>w<CR>", opts("Save file"))
+keymap.set("n", "<leader>q", "<cmd>q<CR>", opts("Quit"))
+keymap.set("n", "<leader>Q", "<cmd>qa!<CR>", opts("Quit all without saving"))
+keymap.set("n", "<leader>x", "<cmd>x<CR>", opts("Save and quit"))
 
 -- Indent
 keymap.set("v", "<", "<gv", opts("Indent left"))

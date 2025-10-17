@@ -21,8 +21,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
     end,
 })
 
+local mason_path = vim.fn.glob(vim.fn.stdpath("data") .. "/mason/bin/")
+
 vim.lsp.config("lua_ls", {
-    cmd = { "lua-language-server" },
+    cmd = { mason_path .. "lua-language-server" },
     filetypes = { "lua" },
     root_markers = {
         ".luarc.json",
@@ -50,7 +52,7 @@ vim.lsp.config("lua_ls", {
 })
 
 vim.lsp.config("clangd", {
-    cmd = { "clangd", "--clang-tidy", "--background-index", "--offset-encoding=utf-8" },
+    cmd = { mason_path .. "clangd", "--clang-tidy", "--background-index", "--offset-encoding=utf-8" },
     filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
     root_markers = {
         ".clangd",
@@ -64,7 +66,7 @@ vim.lsp.config("clangd", {
 })
 
 vim.lsp.config("ty", {
-    cmd = { "ty", "server" },
+    cmd = { mason_path .. "ty", "server" },
     filetypes = { "python" },
     root_markers = { "ty.toml", "pyproject.toml", ".git" },
 })
