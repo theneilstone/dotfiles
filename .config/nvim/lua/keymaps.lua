@@ -24,28 +24,36 @@ keymap.set("n", "<leader>sx", "<cmd>close<CR>", opts("Close current split"))
 -- Window resize mode (press <leader>r to enter, then use hjkl repeatedly)
 keymap.set("n", "<leader>r", function()
     if vim.bo.buftype ~= "" then return end
+
     vim.g._resize_mode = true
-    vim.notify("[Resize Mode] Entered", vim.log.levels.INFO)
+    vim.notify("[Resize Mode] h/j/k/l=resize | e=equal | x=exit", vim.log.levels.INFO)
+
     local actions = {
-        h = function() vim.cmd("vertical resize -2") end,
-        j = function() vim.cmd("resize -2") end,
-        k = function() vim.cmd("resize +2") end,
-        l = function() vim.cmd("vertical resize +2") end,
-        e = function() vim.cmd("wincmd =") end,
+        h = function() vim.cmd("vertical resize -3") end,  -- Decrease width
+        j = function() vim.cmd("resize -2") end,           -- Decrease height
+        k = function() vim.cmd("resize +2") end,           -- Increase height
+        l = function() vim.cmd("vertical resize +3") end,  -- Increase width
+        e = function() vim.cmd("wincmd =") end,            -- Equalize windows
     }
+
     while true do
+        vim.cmd("redraw")  -- Force redraw to update display
         local ok, char = pcall(vim.fn.getchar)
         if not ok then break end
         local key = type(char) == "number" and vim.fn.nr2char(char) or char
         if key == "x" then
             vim.g._resize_mode = false
-            vim.notify("[Resize Mode] Exit", vim.log.levels.INFO)
+            vim.cmd("redraw")
+            vim.notify("Exited resize mode", vim.log.levels.INFO)
             break
         end
         local action = actions[key]
-        if action then action() end
+        if action then
+            pcall(action)
+        end
     end
     vim.g._resize_mode = false
+    vim.cmd("redraw")
 end, opts("Enter window resize mode"))
 
 -- Quick escape
