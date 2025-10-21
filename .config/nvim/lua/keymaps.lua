@@ -21,40 +21,88 @@ keymap.set("n", "<leader>sh", "<C-w>s", opts("Split window horizontally"))
 keymap.set("n", "<leader>se", "<C-w>=", opts("Make splits equal size"))
 keymap.set("n", "<leader>sx", "<cmd>close<CR>", opts("Close current split"))
 
--- Window resize mode (press <leader>r to enter, then use hjkl repeatedly)
+-- Window resize mode - smart direction detection
 keymap.set("n", "<leader>r", function()
-    if vim.bo.buftype ~= "" then return end
+    if #vim.api.nvim_tabpage_list_wins(0) <= 1 then
+        vim.notify("Only one window, nothing to resize", vim.log.levels.WARN)
+        return
+    end
 
     vim.g._resize_mode = true
-    vim.notify("[Resize Mode] h/j/k/l=resize | e=equal | x=exit", vim.log.levels.INFO)
+    vim.notify("[Resize] h/l=width | j/k=height | e=equal | q=quit", vim.log.levels.INFO)
 
-    local actions = {
-        h = function() vim.cmd("vertical resize -3") end,  -- Decrease width
-        j = function() vim.cmd("resize -2") end,           -- Decrease height
-        k = function() vim.cmd("resize +2") end,           -- Increase height
-        l = function() vim.cmd("vertical resize +3") end,  -- Increase width
-        e = function() vim.cmd("wincmd =") end,            -- Equalize windows
+    -- Detect if we can move in a direction (returns true if split exists)
+    local function can_move(direction)
+        local cur_win = vim.api.nvim_get_current_win()
+        vim.cmd("noautocmd wincmd " .. direction)
+        local moved = vim.api.nvim_get_current_win() ~= cur_win
+        if moved then
+            -- Move back to restore position
+            local reverse = ({ h = "l", l = "h", j = "k", k = "j" })[direction]
+            vim.cmd("noautocmd wincmd " .. reverse)
+        end
+        return moved
+    end
+
+    -- Resize actions with step sizes
+    local resize_actions = {
+        h = {
+            check = function()
+                return can_move("h") or can_move("l")
+            end,
+            cmd = "vertical resize -3",
+        },
+        l = {
+            check = function()
+                return can_move("h") or can_move("l")
+            end,
+            cmd = "vertical resize +3",
+        },
+        k = {
+            check = function()
+                return can_move("k") or can_move("j")
+            end,
+            cmd = "resize -2",
+        },
+        j = {
+            check = function()
+                return can_move("k") or can_move("j")
+            end,
+            cmd = "resize +2",
+        },
+        e = {
+            check = function()
+                return true
+            end,
+            cmd = "wincmd =",
+        },
     }
 
+    -- Main input loop
     while true do
-        vim.cmd("redraw")  -- Force redraw to update display
         local ok, char = pcall(vim.fn.getchar)
-        if not ok then break end
-        local key = type(char) == "number" and vim.fn.nr2char(char) or char
-        if key == "x" then
-            vim.g._resize_mode = false
-            vim.cmd("redraw")
-            vim.notify("Exited resize mode", vim.log.levels.INFO)
+        if not ok then
             break
         end
-        local action = actions[key]
-        if action then
-            pcall(action)
+
+        local key = type(char) == "number" and vim.fn.nr2char(char) or tostring(char)
+
+        -- Exit on q, x, or ESC
+        if key == "q" or key == "x" or char == 27 then
+            break
+        end
+
+        -- Execute resize action if valid
+        local action = resize_actions[key]
+        if action and action.check() then
+            vim.cmd(action.cmd)
+            vim.cmd("redraw")
         end
     end
+
     vim.g._resize_mode = false
-    vim.cmd("redraw")
-end, opts("Enter window resize mode"))
+    vim.notify("Exited resize mode", vim.log.levels.INFO)
+end, opts("Window resize mode"))
 
 -- Quick escape
 keymap.set("i", "jk", "<ESC>", opts("Exit insert mode"))
