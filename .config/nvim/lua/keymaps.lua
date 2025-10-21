@@ -107,6 +107,10 @@ end, opts("Window resize mode"))
 -- Quick escape
 keymap.set("i", "jk", "<ESC>", opts("Exit insert mode"))
 keymap.set("i", "kj", "<ESC>", opts("Exit insert mode"))
+keymap.set("i", "<C-h>", "<Left>", opts("Insert mode: move left"))
+keymap.set("i", "<C-n>", "<Down>", opts("Insert mode: move down"))
+keymap.set("i", "<C-p>", "<Up>", opts("Insert mode: move up"))
+keymap.set("i", "<C-l>", "<Right>", opts("Insert mode: move right"))
 
 -- Save and quit
 keymap.set("n", "<leader>w", "<cmd>w<CR>", opts("Save file"))
