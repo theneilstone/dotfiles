@@ -118,10 +118,13 @@ keymap.set("n", "<leader>q", "<cmd>q<CR>", opts("Quit"))
 keymap.set("n", "<leader>Q", "<cmd>qa!<CR>", opts("Quit all without saving"))
 keymap.set("n", "<leader>x", "<cmd>x<CR>", opts("Save and quit"))
 
--- Indent
 keymap.set("v", "<", "<gv", opts("Indent left"))
 keymap.set("v", ">", ">gv", opts("Indent right"))
 
--- Comment
-keymap.set("n", "gcc", "gcc", { remap = true, desc = "Toggle comment line" })
-keymap.set("v", "gc", "gc", { remap = true, desc = "Toggle comment" })
+-- Alternative for visual block mode (fix <C-v> conflict)
+keymap.set("n", "<C-q>", "<C-v>", opts("Visual block mode (alternative to <C-v>)"))
+
+-- Diff current and other split
+keymap.set("n", "<leader>df", function()
+    vim.cmd("windo diffthis")
+end, opts("Diff current buffer with another file"))
