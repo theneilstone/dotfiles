@@ -5,8 +5,6 @@
 # *.[oa]
 # *~
 
-# Copy tihs file to .dotfiles/info/exclude
-
 /*
 !/.*
 /.dotfiles/
@@ -19,6 +17,7 @@
 # Apple stuff
 .CFUserTextEncoding
 .DS_Store
+.Trash/
 
 .gitconfig
 .bash_history
@@ -31,7 +30,22 @@
 .gnupg/
 
 .npm/
+.nvm/
 .tldrc/
 .vscode/
+.ollama/
+.gradle/
+.jenv/
 
 .lesshst
+.yarnrc
+
+.emacs.d
+!.emacs.d/init.el
+
+.config/tmux/plugins
+.config/iterm2/
+.config/github-copilot/
+.config/terminal/
+.config/nvim/lazy-lock.json
+.config/posting/
