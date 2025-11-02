@@ -185,6 +185,7 @@
   (setq eglot-eldoc-function 'ignore)
   (setq eldoc-echo-area-use-multiline-p nil)
   :hook ((python-mode . eglot-ensure)
+	 (ruby-ts-mode . eglot-ensure)
 	 (python-ts-mode . eglot-ensure)
 	 (lua-mode . eglot-ensure))
   :bind ("C-c e f" . eglot-format))
@@ -192,6 +193,8 @@
 (use-package lua-mode
   :ensure t
   :mode ("\\.lua\\'" . lua-mode))
+
+
 
 (use-package treesit
   :when (and (fboundp 'treesit-available-p)
@@ -280,7 +283,7 @@
 	 ("C-c b" . org-switchb)
 	 ("C-c c" . org-capture)
 	 ("C-c l" . org-store-link))
-  :hook ((org-mode . org-indent-mode)
+  :hook (; (org-mode . org-indent-mode)
 	 ; (org-mode . visual-line-mode)
 	 ; (org-mode . org-agenda-start-with-log-mode)
 	 (org-mode . (lambda () (ido-mode 'both))))
@@ -295,7 +298,7 @@
 	  (sequence "WAIT(w@/!)" "HOLD(h@/!)" "|" "CANC(c@/!)")))
   ;; States color
   (setq org-todo-keyword-faces
-	'(("TODO" :foreground "red"          :weight bold)
+	'(("TODO" :foreground "lightgreen"   :weight bold)
 	  ("NEXT" :foreground "blue"         :weight bold)
 	  ("DONE" :foreground "forest green" :weight bold)
 	  ("WAIT" :foreground "orange"       :weight bold)
@@ -509,6 +512,40 @@
   (setq visual-fill-column-width 100
 	visual-fill-column-center-text t)
   :hook ((org-mode . visual-fill-column-mode)))
+
+;;; ref: https://emacs.stackexchange.com/a/46913
+;;; Configure magit to use .dotfiles (and not .git) as the git
+;;; directory when a .dotfiles directory is found in the current
+;;; working directory (which Emacs calls its `default-directory'
+;;; per buffer) and there is no .git directory.
+;;;
+;;; For example, if dotfiles are tracked with a git directory at
+;;; $HOME/.dotfiles, and the Emacs process starts from $HOME (and
+;;; nothing in its configuration changes its `default-directory'
+;;; in the current buffer), this will configure magit to use
+;;; .dotfiles as the git directory.
+;;;
+;;; NOTE: This setting will apply for the entire Emacs process,
+;;; regardless of magit invocation in other directories.
+(unless (boundp 'dotfiles-magit-hook?)
+  ;; Only run this hook once, even if Emacs reloads configuration.
+  (eval-after-load 'magit
+    '(let ((dotfiles-path (expand-file-name ".dotfiles")))
+       (when (and (file-exists-p dotfiles-path)
+                  (not (file-exists-p ".git")))
+         ;; Insert git directory and working tree into magit's git
+         ;; global arguments, while preserving magit's existing
+         ;; command-line settings; `add-to-list' adds to the
+         ;; beginning of the list.
+         (add-to-list 'magit-git-global-arguments
+                      (format "--work-tree=%s"
+                              ;; Drop trailing slash.
+                              (directory-file-name
+                               ;; Get directory part (`dirname`).
+                               (file-name-directory dotfiles-path))))
+         (add-to-list 'magit-git-global-arguments
+                      (format "--git-dir=%s" dotfiles-path)))))
+  (setq dotfiles-magit-hook? t))
 
 (setq custom-file "~/.emacs.d/custom.el")
 (unless (file-exists-p custom-file)
