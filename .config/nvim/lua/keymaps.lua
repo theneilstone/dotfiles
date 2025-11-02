@@ -118,6 +118,15 @@ keymap.set("n", "<leader>q", "<cmd>q<CR>", opts("Quit"))
 keymap.set("n", "<leader>Q", "<cmd>qa!<CR>", opts("Quit all without saving"))
 keymap.set("n", "<leader>x", "<cmd>x<CR>", opts("Save and quit"))
 
+-- Tabs
+keymap.set("n", "<Tab>", "gt", opts("Next tab"))
+keymap.set("n", "<S-Tab>", "gT", opts("Previous tab"))
+keymap.set("n", "<leader>tn", ":tabnew<CR>", opts("New tab"))
+keymap.set("n", "<leader>tc", ":tabclose<CR>", opts("Close tab"))
+for i = 1, 9 do
+    keymap.set("n", "<leader>"..i, i.."gt", opts("Go to tab "..i))
+end
+
 keymap.set("v", "<", "<gv", opts("Indent left"))
 keymap.set("v", ">", ">gv", opts("Indent right"))
 
