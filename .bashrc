@@ -5,7 +5,20 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
-PS1="\[\033[36m\]\u\[\033[m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]\n\$ "
+_short_pwd() {
+        local IFS="/"; local arr=($PWD); local n=${#arr[@]}; local out=""
+        if (( n <= 2 )); then
+                out="/${arr[n-1]}"
+        else
+                for ((i=1;i<n-1;i++)); do
+                        [ -n "${arr[i]}" ] && out+="/${arr[i]:0:1}"
+                done
+                out+="/${arr[n-1]}"
+        fi
+        echo "$out"
+}
+
+PS1="\[\033[38;5;250m\]\u\[\033[m\]\[\033[38;5;252m\]@\[\033[m\]\[\033[38;5;250m\]\h\[\033[m\]:\[\033[38;5;67m\]\$(_short_pwd)\[\033[m\]\[\033[38;5;108m\]\$(__git_ps1)\[\033[m\] \$ "
 
 # Alias
 alias ls='ls --color=auto'
@@ -24,6 +37,7 @@ alias dot='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 # Env export
 export GPG_TTY=$(tty)
 export EDITOR='vim'
+export GIT_EDITOR='vim'
 export HISTCONTROL=ignoreboth
 
 # Compile
