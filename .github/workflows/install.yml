@@ -1,0 +1,30 @@
+name: install CI
+
+on: [push, pull_request]
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: chmod +x .config/install.sh
+      - run: .config/install.sh --init --dry-run
+      - run: shellcheck .config/install.sh
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: chmod +x .config/install.sh
+      - run: .config/install.sh --init --dry-run
+      - run: shellcheck .config/install.sh
+
+  arch:
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pacman -Sy --noconfirm git
+      - run: chmod +x .config/install.sh
+      - run: .config/install.sh --init --dry-run
+      - run: shellcheck .config/install.sh
