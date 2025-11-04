@@ -61,7 +61,7 @@ setup_packages() {
         $SUDO yum install -y git curl vim bat unzip tree tmux ripgrep fzf neovim wget python3 nodejs tldr
     elif [ -f /etc/arch-release ]; then
         # Arch Linux: Use pacman
-        $SUDO pacman -Sy --noconfirm git curl vim bat unzip tree tmux ripgrep fzf neovim wget python3 nodejs tldr
+        $SUDO pacman -Sy --noconfirm git curl vim bat unzip tree tmux ripgrep fzf neovim wget python3 nodejs tldr shellcheck
     else
         # Unsupported OS
         echo "Unsupported operating system. Please install git curl vim bat unzip manually."

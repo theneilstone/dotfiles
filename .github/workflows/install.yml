@@ -15,6 +15,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: chmod +x install.sh
       - run: ./install.sh
+      - run: shellcheck install.sh
 
   macos:
     runs-on: macos-latest
@@ -22,6 +23,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: chmod +x install.sh
       - run: ./install.sh
+      - run: shellcheck install.sh
 
   arch:
     runs-on: ubuntu-latest
@@ -31,3 +33,4 @@ jobs:
       - run: pacman -Sy --noconfirm git
       - run: chmod +x install.sh
       - run: ./install.sh
+      - run: shellcheck install.sh
