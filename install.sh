@@ -48,7 +48,7 @@ setup_packages() {
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         fi
         brew update
-        brew install git curl vim bat unzip tree tmux ripgrep fzf neovim wget python node tldr
+        brew install git curl vim bat unzip tree tmux ripgrep fzf neovim wget python node tldr shellcheck
     elif [ -f /etc/debian_version ]; then
         # Debian/Ubuntu: Use apt
         $SUDO apt update
