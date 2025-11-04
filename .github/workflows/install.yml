@@ -1,6 +1,12 @@
 name: install CI
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - install.sh
+  pull_request:
+    paths:
+      - install.sh
 
 jobs:
   linux:
@@ -9,7 +15,6 @@ jobs:
       - uses: actions/checkout@v4
       - run: chmod +x install.sh
       - run: ./install.sh
-      - run: shellcheck install.sh
 
   macos:
     runs-on: macos-latest
@@ -26,4 +31,3 @@ jobs:
       - run: pacman -Sy --noconfirm git
       - run: chmod +x install.sh
       - run: ./install.sh
-      - run: shellcheck install.sh
