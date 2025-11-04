@@ -2,10 +2,17 @@
 
 set -e
 
-# Check for sudo availability
-if ! command -v sudo >/dev/null 2>&1; then
-    echo "Error: sudo is not available. Please install sudo or run as root."
-    exit 1
+
+# Detect if running as root, set SUDO variable
+if [ "$(id -u)" -eq 0 ]; then
+    SUDO=""
+else
+    if command -v sudo >/dev/null 2>&1; then
+        SUDO="sudo"
+    else
+        echo "Error: sudo is not available and you are not root. Please install sudo or run as root."
+        exit 1
+    fi
 fi
 
 setup_proxy() {
@@ -41,20 +48,20 @@ setup_packages() {
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         fi
         brew update
-        brew install git curl vim bat unzip tree tmux ripgrep fzf neovim wget python node tldr
+        brew install git curl vim bat unzip tree tmux ripgrep fzf neovim wget python node tldr shellcheck
     elif [ -f /etc/debian_version ]; then
         # Debian/Ubuntu: Use apt
-        sudo apt update
-        sudo apt install -y git curl vim bat unzip tree tmux ripgrep fzf neovim wget python3 nodejs tldr
+        $SUDO apt update
+        $SUDO apt install -y git curl vim bat unzip tree tmux ripgrep fzf neovim wget python3 nodejs tldr
     elif [ -f /etc/fedora-release ]; then
         # Fedora: Use dnf
-        sudo dnf install -y git curl vim bat unzip tree tmux ripgrep fzf neovim wget python3 nodejs tldr
+        $SUDO dnf install -y git curl vim bat unzip tree tmux ripgrep fzf neovim wget python3 nodejs tldr
     elif [ -f /etc/centos-release ]; then
         # CentOS: Use yum
-        sudo yum install -y git curl vim bat unzip tree tmux ripgrep fzf neovim wget python3 nodejs tldr
+        $SUDO yum install -y git curl vim bat unzip tree tmux ripgrep fzf neovim wget python3 nodejs tldr
     elif [ -f /etc/arch-release ]; then
         # Arch Linux: Use pacman
-        sudo pacman -Sy --noconfirm git curl vim bat unzip tree tmux ripgrep fzf neovim wget python3 nodejs tldr
+        $SUDO pacman -Sy --noconfirm git curl vim bat unzip tree tmux ripgrep fzf neovim wget python3 nodejs tldr
     else
         # Unsupported OS
         echo "Unsupported operating system. Please install git curl vim bat unzip manually."
