@@ -49,3 +49,5 @@
 .config/terminal/
 .config/nvim/lazy-lock.json
 .config/posting/
+
+!install.sh
