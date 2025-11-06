@@ -5,6 +5,14 @@ vim.keymap.del("n", "grr")
 vim.keymap.del("n", "gri")
 vim.keymap.del("n", "gO")
 
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+    callback = function()
+        vim.keymap.set("n", "<space>f", function()
+            require("conform").format({ async = true, lsp_fallback = true })
+        end, { noremap = true, silent = true, buffer = true })
+    end,
+})
+
 vim.api.nvim_create_autocmd("LspAttach", {
     callback = function()
         local keymap = vim.keymap
@@ -15,9 +23,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
         keymap.set("n", "gd", lsp.buf.definition, bufopts)
         keymap.set("n", "<space>rn", lsp.buf.rename, bufopts)
         keymap.set("n", "K", lsp.buf.hover, bufopts)
-        keymap.set("n", "<space>f", function()
-            require("conform").format({ async = true, lsp_fallback = true })
-        end, bufopts)
+        -- keymap.set("n", "<space>f", function()
+        --     require("conform").format({ async = true, lsp_fallback = true })
+        -- end, bufopts)
     end,
 })
 

@@ -6,6 +6,10 @@ return {
             c = { "clang-format" },
             cpp = { "clang-format" },
             python = { "black" },
+            xml = { "xmllint" },
+            json = { "jq" },
+            yaml = { "prettier" },
+            yml = { "prettier" },
         },
         formatters = {
             stylua = {
@@ -16,6 +20,21 @@ return {
             },
             ["clang-format"] = {
                 prepend_args = { "--style={IndentWidth: 4, UseTab: Never}" },
+            },
+            xmllint = {
+                command = "xmllint",
+                args = { "--format", "-" },
+                stdin = true,
+            },
+            jq = {
+                command = "jq",
+                args = { "." },
+                stdin = true,
+            },
+            prettier = {
+                command = "prettier",
+                args = { "--parser", "yaml" },
+                stdin = true,
             },
         },
     },
