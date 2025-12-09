@@ -5,6 +5,24 @@ vim.keymap.del("n", "grr")
 vim.keymap.del("n", "gri")
 vim.keymap.del("n", "gO")
 
+-- Diagnostic config
+vim.diagnostic.config({
+    virtual_text = { prefix = "●", spacing = 4 },
+    signs = {
+        active = true,
+        values = {
+            Error = { text = "", texthl = "DiagnosticSignError" },
+            Warn = { text = "", texthl = "DiagnosticSignWarn" },
+            Hint = { text = "", texthl = "DiagnosticSignHint" },
+            Info = { text = "", texthl = "DiagnosticSignInfo" },
+        },
+    },
+    update_in_insert = false,
+    underline = true,
+    severity_sort = true,
+    float = { focusable = false, style = "minimal", border = "rounded", source = "always" },
+})
+
 vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
     callback = function()
         vim.keymap.set("n", "<space>f", function()
@@ -22,10 +40,11 @@ vim.api.nvim_create_autocmd("LspAttach", {
         keymap.set("n", "gr", lsp.buf.references, bufopts)
         keymap.set("n", "gd", lsp.buf.definition, bufopts)
         keymap.set("n", "<space>rn", lsp.buf.rename, bufopts)
-        keymap.set("n", "K", lsp.buf.hover, bufopts)
-        -- keymap.set("n", "<space>f", function()
-        --     require("conform").format({ async = true, lsp_fallback = true })
-        -- end, bufopts)
+        keymap.set("n", "<leader>K", lsp.buf.hover, bufopts)
+
+        -- Diagnostic mappings (buffer-local) — avoid global conflicts
+        keymap.set("n", "<leader>dd", vim.diagnostic.open_float, bufopts)
+        keymap.set("n", "<leader>dl", vim.diagnostic.setloclist, bufopts)
     end,
 })
 
@@ -76,7 +95,7 @@ vim.lsp.config("clangd", {
 vim.lsp.config("ty", {
     cmd = { mason_path .. "ty", "server" },
     filetypes = { "python" },
-    root_markers = { "ty.toml", "pyproject.toml", ".git" },
+    root_markers = { "pyproject.toml", "setup.cfg", "requirements.txt", ".git" },
 })
 
 vim.lsp.enable({ "lua_ls", "clangd", "ty" })

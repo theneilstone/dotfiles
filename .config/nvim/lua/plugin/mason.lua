@@ -24,7 +24,6 @@ return {
             "clang-format", -- C/C++
             -- Linters
             "luacheck", -- Lua
-            "mypy", -- Python
         }
 
         mr:on("package:install:success", function()
