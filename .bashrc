@@ -6,30 +6,42 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
-# Load git-prompt for __git_ps1 (Arch, Ubuntu, macOS)
-if [ -f /usr/share/git/git-prompt.sh ]; then
-        source /usr/share/git/git-prompt.sh
-elif [ -f /etc/bash_completion.d/git-prompt ]; then
-        source /etc/bash_completion.d/git-prompt
-fi
 
-# Shorten current working directory for prompt
-_short_pwd() {
-        local IFS="/"; local arr=($PWD); local n=${#arr[@]}; local out=""
-        if (( n <= 2 )); then
-                out="/${arr[n-1]}"
-        else
-                for ((i=1;i<n-1;i++)); do
-                        [ -n "${arr[i]}" ] && out+="/${arr[i]:0:1}"
-                done
-                out+="/${arr[n-1]}"
-        fi
-        echo "$out"
+_prompt_short_pwd () {
+        [[ $PWD == "/" ]] && { printf "/"; return; }
+        IFS="/" read -ra parts <<< "${PWD#/}"
+        local len=${#parts[@]}
+        local last=${parts[len-1]}
+        (( len <= 2 )) && { printf "/%s" "$last"; return; }
+        local short=""
+        for ((i=0; i<len-1; i++)); do
+                short+="/${parts[i]:0:1}"
+        done
+        printf "%s/%s" "$short" "$last"
 }
 
-# Custom prompt with username, host, short path, git branch
-PS1="\[\033[38;5;250m\]\u\[\033[m\]\[\033[38;5;252m\]@\[\033[m\]\[\033[38;5;250m\]\h\[\033[m\]:\[\033[38;5;67m\]\$(_short_pwd)\[\033[m\]\[\033[38;5;108m\]\$(__git_ps1)\[\033[m\] \[\033[38;5;226m\]\$\[\033[m\] "
+_prompt_git_branch () {
+        local branch=""
+        if command -v git >/dev/null 2>&1; then
+                branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+        fi
+        [[ -n $branch && $branch != "HEAD" ]] && printf " (%s)" "$branch"
+}
 
+_prompt_git_changes () {
+        if ! command -v git >/dev/null 2>&1; then
+                return
+        fi
+        local staged unstaged
+        staged=$(git status --porcelain 2>/dev/null | awk '{ if (substr($0,1,1) != " " && substr($0,1,1) != "?") print }' | wc -l | tr -d ' ')
+        unstaged=$(git status --porcelain 2>/dev/null | awk '{ if (substr($0,2,1) != " ") print }' | wc -l | tr -d ' ')
+        if (( staged == 0 && unstaged == 0 )); then
+                return
+        fi
+        printf " %s/%s" "$staged" "$unstaged"
+}
+
+PS1="\[\033[38;5;69m\]\u@\h\[\033[m\] \[\033[38;5;34m\]\$(_prompt_short_pwd)\[\033[m\]\[\033[38;5;154m\]\$(_prompt_git_branch)\[\033[m\]\[\033[38;5;203m\]\$(_prompt_git_changes)\[\033[m\] \[\033[38;5;226m\]\$\[\033[m\] "
 
 # Aliases
 alias ls='ls --color=auto'
@@ -90,4 +102,11 @@ if [ -f /opt/homebrew/etc/bash_completion ]; then
         . /opt/homebrew/etc/bash_completion
 elif [ -f /etc/bash_completion ]; then
         . /etc/bash_completion
+fi
+
+# asdf completion: prefer static completion files (safer)
+if [ -f "/opt/homebrew/opt/asdf/etc/bash_completion.d/asdf" ]; then
+        . "/opt/homebrew/opt/asdf/etc/bash_completion.d/asdf"
+elif [ -f "$HOME/.asdf/completions/asdf.bash" ]; then
+        . "$HOME/.asdf/completions/asdf.bash"
 fi
